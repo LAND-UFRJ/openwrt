@@ -213,27 +213,6 @@ static struct rtpcs_link *rtpcs_phylink_pcs_to_link(struct phylink_pcs *pcs)
 
 /* Variant-specific functions */
 
-/* RTL93XX */
-
-static int rtpcs_93xx_sds_set_polarity(struct rtpcs_ctrl *ctrl, u32 sds,
-				       bool tx_inv, bool rx_inv)
-{
-	u8 rx_val = rx_inv ? 1 : 0;
-	u8 tx_val = tx_inv ? 1 : 0;
-	u32 val;
-	int ret;
-
-	/* 10GR */
-	val = (tx_val << 1) | rx_val;
-	ret = rtpcs_sds_write_bits(ctrl, sds, 0x6, 0x2, 14, 13, val);
-	if (ret)
-		return ret;
-
-	/* 1G */
-	val = (rx_val << 1) | tx_val;
-	return rtpcs_sds_write_bits(ctrl, sds, 0x0, 0x0, 9, 8, val);
-}
-
 /* RTL930X */
 
 /* The access registers for SDS_MODE_SEL and the LSB for each SDS within */
@@ -1277,7 +1256,7 @@ static void rtpcs_930x_sds_do_rx_calibration_2_3(struct rtpcs_ctrl *ctrl,
 		fgcal_binary = rtpcs_sds_read_bits(ctrl, sds_num, 0x1f, 0x14, 5, 0);
 
 		pr_info("%s: fgcal_gray: %d, fgcal_binary %d\n",
-		        __func__, fgcal_gray, fgcal_binary);
+			__func__, fgcal_gray, fgcal_binary);
 
 		offset_range = rtpcs_sds_read_bits(ctrl, sds_num, 0x2e, 0x15, 15, 14);
 
@@ -1645,6 +1624,25 @@ static int rtpcs_930x_sds_10g_idle(struct rtpcs_ctrl *ctrl, int sds_num)
 	return -EIO;
 }
 
+static int rtpcs_930x_sds_set_polarity(struct rtpcs_ctrl *ctrl, u32 sds,
+				       bool tx_inv, bool rx_inv)
+{
+	u8 rx_val = rx_inv ? 1 : 0;
+	u8 tx_val = tx_inv ? 1 : 0;
+	u32 val;
+	int ret;
+
+	/* 10GR */
+	val = (tx_val << 1) | rx_val;
+	ret = rtpcs_sds_write_bits(ctrl, sds, 0x6, 0x2, 14, 13, val);
+	if (ret)
+		return ret;
+
+	/* 1G */
+	val = (rx_val << 1) | tx_val;
+	return rtpcs_sds_write_bits(ctrl, sds, 0x0, 0x0, 9, 8, val);
+}
+
 static const sds_config rtpcs_930x_sds_cfg_10gr_even[] =
 {
 	/* 1G */
@@ -1917,7 +1915,7 @@ static int rtpcs_930x_setup_serdes(struct rtpcs_ctrl *ctrl, int sds,
 	pr_info("%s: Configuring RTL9300 SERDES %d\n", __func__, sds);
 
 	/* Set SDS polarity */
-	rtpcs_93xx_sds_set_polarity(ctrl, sds, ctrl->tx_pol_inv[sds],
+	rtpcs_930x_sds_set_polarity(ctrl, sds, ctrl->tx_pol_inv[sds],
 				    ctrl->rx_pol_inv[sds]);
 
 	/* Enable SDS in desired mode */
@@ -2144,7 +2142,7 @@ static void rtpcs_931x_sds_cmu_type_set(struct rtpcs_ctrl *ctrl, u32 sds,
 	evenSds = sds - lane;
 
 	pr_info("%s: cmu_type %0d cmu_page %x frc_cmu_spd %d lane %d sds %d\n",
-	        __func__, cmu_type, cmu_page, frc_cmu_spd, lane, sds);
+		__func__, cmu_type, cmu_page, frc_cmu_spd, lane, sds);
 
 	if (cmu_type == 1) {
 		pr_info("%s A CMU page 0x28 0x7 %08x\n", __func__, rtpcs_sds_read(ctrl, sds, 0x28, 0x7));
@@ -2275,6 +2273,29 @@ static int rtpcs_931x_sds_link_sts_get(struct rtpcs_ctrl *ctrl, u32 sds)
 	return sts1;
 }
 
+static int rtpcs_931x_sds_set_polarity(struct rtpcs_ctrl *ctrl, u32 sds,
+				       bool tx_inv, bool rx_inv)
+{
+	u8 rx_val = rx_inv ? 1 : 0;
+	u8 tx_val = tx_inv ? 1 : 0;
+	u32 val;
+	int ret;
+
+	/* 10gr_*_inv */
+	val = (tx_val << 1) | rx_val;
+	ret = rtpcs_sds_write_bits(ctrl, sds, 0x6, 0x2, 14, 13, val);
+	if (ret)
+		return ret;
+
+	/* xsg_*_inv */
+	val = (rx_val << 1) | tx_val;
+	ret = rtpcs_sds_write_bits(ctrl, sds, 0x40, 0x0, 9, 8, val);
+	if (ret)
+		return ret;
+
+	return rtpcs_sds_write_bits(ctrl, sds, 0x80, 0x0, 9, 8, val);
+}
+
 static sds_config sds_config_10p3125g_type1[] = {
 	{ 0x2E, 0x00, 0x0107 }, { 0x2E, 0x01, 0x01A3 }, { 0x2E, 0x02, 0x6A24 },
 	{ 0x2E, 0x03, 0xD10D }, { 0x2E, 0x04, 0x8000 }, { 0x2E, 0x05, 0xA17E },
@@ -2358,7 +2379,7 @@ static int rtpcs_931x_setup_serdes(struct rtpcs_ctrl *ctrl, int sds,
 	}
 
 	pr_info("%s: 2.5gbit %08X", __func__,
-	        rtpcs_sds_read(ctrl, sds, 0x41, 0x14));
+		rtpcs_sds_read(ctrl, sds, 0x41, 0x14));
 
 	regmap_read(ctrl->map, RTL931X_PS_SERDES_OFF_MODE_CTRL_ADDR, &ori);
 	pr_info("%s: RTL931X_PS_SERDES_OFF_MODE_CTRL_ADDR 0x%08X\n", __func__, ori);
@@ -2435,7 +2456,7 @@ static int rtpcs_931x_setup_serdes(struct rtpcs_ctrl *ctrl, int sds,
 		break;
 
 	case PHY_INTERFACE_MODE_10GBASER: /* MII_10GR / MII_10GR1000BX_AUTO: */
-	                                  /* configure 10GR fiber mode=1 */
+					  /* configure 10GR fiber mode=1 */
 		rtpcs_sds_write_bits(ctrl, sds, 0x1f, 0xb, 1, 1, 1);
 
 		/* init fiber_1g */
@@ -2473,7 +2494,7 @@ static int rtpcs_931x_setup_serdes(struct rtpcs_ctrl *ctrl, int sds,
 	case PHY_INTERFACE_MODE_QSGMII:
 	default:
 		pr_info("%s: PHY mode %s not supported by SerDes %d\n",
-		        __func__, phy_modes(mode), sds);
+			__func__, phy_modes(mode), sds);
 		return -ENOTSUPP;
 	}
 
@@ -2497,7 +2518,7 @@ static int rtpcs_931x_setup_serdes(struct rtpcs_ctrl *ctrl, int sds,
 		}
 	}
 
-	rtpcs_93xx_sds_set_polarity(ctrl, sds, ctrl->tx_pol_inv[sds],
+	rtpcs_931x_sds_set_polarity(ctrl, sds, ctrl->tx_pol_inv[sds],
 				    ctrl->rx_pol_inv[sds]);
 
 	val = ori & ~BIT(sds);

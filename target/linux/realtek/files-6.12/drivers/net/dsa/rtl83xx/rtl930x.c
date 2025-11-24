@@ -404,9 +404,9 @@ static void rtldsa_930x_enable_flood(int port, bool enable)
 static void rtl930x_stp_get(struct rtl838x_switch_priv *priv, u16 msti, u32 port_state[])
 {
 	u32 cmd = 1 << 17 | /* Execute cmd */
-	          0 << 16 | /* Read */
-	          4 << 12 | /* Table type 0b10 */
-	          (msti & 0xfff);
+		  0 << 16 | /* Read */
+		  4 << 12 | /* Table type 0b10 */
+		  (msti & 0xfff);
 	priv->r->exec_tbl0_cmd(cmd);
 
 	for (int i = 0; i < 2; i++)
@@ -417,9 +417,9 @@ static void rtl930x_stp_get(struct rtl838x_switch_priv *priv, u16 msti, u32 port
 static void rtl930x_stp_set(struct rtl838x_switch_priv *priv, u16 msti, u32 port_state[])
 {
 	u32 cmd = 1 << 17 | /* Execute cmd */
-	          1 << 16 | /* Write */
-	          4 << 12 | /* Table type 4 */
-	          (msti & 0xfff);
+		  1 << 16 | /* Write */
+		  4 << 12 | /* Table type 4 */
+		  (msti & 0xfff);
 
 	for (int i = 0; i < 2; i++)
 		sw_w32(port_state[i], RTL930X_TBL_ACCESS_DATA_0(i));
@@ -455,12 +455,12 @@ static u32 rtl930x_l2_hash_key(struct rtl838x_switch_priv *priv, u64 seed)
 {
 	u32 k0, k1, h1, h2, h;
 
-	k0 = (u32) (((seed >> 55) & 0x1f) ^
-	           ((seed >> 44) & 0x7ff) ^
-	           ((seed >> 33) & 0x7ff) ^
-	           ((seed >> 22) & 0x7ff) ^
-	           ((seed >> 11) & 0x7ff) ^
-	           (seed & 0x7ff));
+	k0 = (u32)(((seed >> 55) & 0x1f) ^
+		   ((seed >> 44) & 0x7ff) ^
+		   ((seed >> 33) & 0x7ff) ^
+		   ((seed >> 22) & 0x7ff) ^
+		   ((seed >> 11) & 0x7ff) ^
+		   (seed & 0x7ff));
 
 	h1 = (seed >> 11) & 0x7ff;
 	h1 = ((h1 & 0x1f) << 6) | ((h1 >> 5) & 0x3f);
@@ -468,12 +468,12 @@ static u32 rtl930x_l2_hash_key(struct rtl838x_switch_priv *priv, u64 seed)
 	h2 = (seed >> 33) & 0x7ff;
 	h2 = ((h2 & 0x3f) << 5)| ((h2 >> 6) & 0x3f);
 
-	k1 = (u32) (((seed << 55) & 0x1f) ^
-	           ((seed >> 44) & 0x7ff) ^
-	           h2 ^
-	           ((seed >> 22) & 0x7ff) ^
-	           h1 ^
-	           (seed & 0x7ff));
+	k1 = (u32)(((seed << 55) & 0x1f) ^
+		   ((seed >> 44) & 0x7ff) ^
+		   h2 ^
+		   ((seed >> 22) & 0x7ff) ^
+		   h1 ^
+		   (seed & 0x7ff));
 
 	/* Algorithm choice for block 0 */
 	if (sw_r32(RTL930X_L2_CTRL) & BIT(0))
@@ -896,11 +896,11 @@ u32 rtl930x_hash(struct rtl838x_switch_priv *priv, u64 seed)
 	u32 k0, k1, h1, h2, h;
 
 	k0 = (u32) (((seed >> 55) & 0x1f) ^
-	            ((seed >> 44) & 0x7ff) ^
-	            ((seed >> 33) & 0x7ff) ^
-	            ((seed >> 22) & 0x7ff) ^
-	            ((seed >> 11) & 0x7ff) ^
-	            (seed & 0x7ff));
+		    ((seed >> 44) & 0x7ff) ^
+		    ((seed >> 33) & 0x7ff) ^
+		    ((seed >> 22) & 0x7ff) ^
+		    ((seed >> 11) & 0x7ff) ^
+		    (seed & 0x7ff));
 
 	h1 = (seed >> 11) & 0x7ff;
 	h1 = ((h1 & 0x1f) << 6) | ((h1 >> 5) & 0x3f);
@@ -909,11 +909,11 @@ u32 rtl930x_hash(struct rtl838x_switch_priv *priv, u64 seed)
 	h2 = ((h2 & 0x3f) << 5) | ((h2 >> 6) & 0x3f);
 
 	k1 = (u32) (((seed << 55) & 0x1f) ^
-	           ((seed >> 44) & 0x7ff) ^
-	           h2 ^
-	           ((seed >> 22) & 0x7ff) ^
-	           h1 ^
-	           (seed & 0x7ff));
+		    ((seed >> 44) & 0x7ff) ^
+		    h2 ^
+		    ((seed >> 22) & 0x7ff) ^
+		    h1 ^
+		    (seed & 0x7ff));
 
 	/* Algorithm choice for block 0 */
 	if (sw_r32(RTL930X_L2_CTRL) & BIT(0))
@@ -1020,14 +1020,14 @@ static u32 rtl930x_l3_hash4(u32 ip, int algorithm, bool move_dip)
 // 	rows[10] = (HASH_PICK(ip6->s6_addr[10], 0, 5) << 4) | HASH_PICK(ip6->s6_addr[11], 4, 4);
 // 	if (!algorithm) {
 // 		rows[11] = (HASH_PICK(ip6->s6_addr[11], 0, 4) << 5) |
-// 		           (HASH_PICK(ip6->s6_addr[12], 3, 5) << 0);
+// 			   (HASH_PICK(ip6->s6_addr[12], 3, 5) << 0);
 // 		rows[12] = (HASH_PICK(ip6->s6_addr[12], 0, 3) << 6) |
-// 		           (HASH_PICK(ip6->s6_addr[13], 2, 6) << 0);
+// 			   (HASH_PICK(ip6->s6_addr[13], 2, 6) << 0);
 // 		rows[13] = (HASH_PICK(ip6->s6_addr[13], 0, 2) << 7) |
-// 		           (HASH_PICK(ip6->s6_addr[14], 1, 7) << 0);
+// 			   (HASH_PICK(ip6->s6_addr[14], 1, 7) << 0);
 // 		if (!move_dip) {
 // 			rows[14] = (HASH_PICK(ip6->s6_addr[14], 0, 1) << 8) |
-// 			           (HASH_PICK(ip6->s6_addr[15], 0, 8) << 0);
+// 				   (HASH_PICK(ip6->s6_addr[15], 0, 8) << 0);
 // 		}
 // 		hash = rows[0] ^ rows[1] ^ rows[2] ^ rows[3] ^ rows[4] ^
 // 		       rows[5] ^ rows[6] ^ rows[7] ^ rows[8] ^ rows[9] ^
@@ -1036,12 +1036,12 @@ static u32 rtl930x_l3_hash4(u32 ip, int algorithm, bool move_dip)
 // 		rows[11] = (HASH_PICK(ip6->s6_addr[11], 0, 4) << 5);
 // 		rows[12] = (HASH_PICK(ip6->s6_addr[12], 3, 5) << 0);
 // 		rows[13] = (HASH_PICK(ip6->s6_addr[12], 0, 3) << 6) |
-// 		           HASH_PICK(ip6->s6_addr[13], 2, 6);
+// 			   HASH_PICK(ip6->s6_addr[13], 2, 6);
 // 		rows[14] = (HASH_PICK(ip6->s6_addr[13], 0, 2) << 7) |
-// 		           HASH_PICK(ip6->s6_addr[14], 1, 7);
+// 			   HASH_PICK(ip6->s6_addr[14], 1, 7);
 // 		if (!move_dip) {
 // 			rows[15] = (HASH_PICK(ip6->s6_addr[14], 0, 1) << 8) |
-// 			           (HASH_PICK(ip6->s6_addr[15], 0, 8) << 0);
+// 				   (HASH_PICK(ip6->s6_addr[15], 0, 8) << 0);
 // 		}
 // 		s0 = rows[12] + rows[13] + rows[14];
 // 		s1 = (s0 & 0x1ff) + ((s0 & (0x1ff << 9)) >> 9);
@@ -2113,9 +2113,9 @@ static void rtl930x_get_l3_router_mac(u32 idx, struct rtl93xx_rt_mac *m)
 	m->vid_mask = w & 0xfff;
 	m->action = sw_r32(rtl_table_data(r, 6)) & 0x7;
 	m->mac_mask = ((((u64)sw_r32(rtl_table_data(r, 5))) << 32) & 0xffffffffffffULL) |
-	              (sw_r32(rtl_table_data(r, 4)));
+		      (sw_r32(rtl_table_data(r, 4)));
 	m->mac = ((((u64)sw_r32(rtl_table_data(r, 1))) << 32) & 0xffffffffffffULL) |
-	         (sw_r32(rtl_table_data(r, 2)));
+		 (sw_r32(rtl_table_data(r, 2)));
 	/* Bits L3_INTF and BMSK_L3_INTF are 0 */
 
 out:
@@ -2329,6 +2329,24 @@ static void rtl930x_vlan_port_pvid_set(int port, enum pbvlan_type type, int pvid
 		sw_w32_mask(0xfff << 16, pvid << 16, RTL930X_VLAN_PORT_PB_VLAN + (port << 2));
 }
 
+static int rtldsa_930x_vlan_port_fast_age(struct rtl838x_switch_priv *priv, int port, u16 vid)
+{
+	u32 val;
+
+	sw_w32(port << 11, RTL930X_L2_TBL_FLUSH_CTRL + 4);
+
+	val = 0;
+	val |= vid << 12;
+	val |= BIT(26); /* compare port id */
+	val |= BIT(28); /* compare VID */
+	val |= BIT(30); /* status - trigger flush */
+	sw_w32(val, RTL930X_L2_TBL_FLUSH_CTRL);
+
+	do { } while (sw_r32(priv->r->l2_tbl_flush_ctrl) & BIT(30));
+
+	return 0;
+}
+
 static int rtl930x_set_ageing_time(unsigned long msec)
 {
 	int t = sw_r32(RTL930X_L2_AGE_CTRL);
@@ -2515,6 +2533,78 @@ static void rtl930x_led_init(struct rtl838x_switch_priv *priv)
 		dev_dbg(dev, "%08x: %08x\n", 0xbb00cc00 + i * 4, sw_r32(0xcc00 + i * 4));
 }
 
+static void rtldsa_930x_qos_set_group_selector(int port, int group)
+{
+	sw_w32_mask(RTL93XX_PORT_TBL_IDX_CTRL_IDX_MASK(port),
+		    group << RTL93XX_PORT_TBL_IDX_CTRL_IDX_OFFSET(port),
+		    RTL930X_PORT_TBL_IDX_CTRL(port));
+}
+
+static void rtldsa_930x_qos_setup_default_dscp2queue_map(void)
+{
+	u32 queue;
+
+	/* The default mapping between dscp and queue is based on
+	 * the first 3 bits indicate the precedence (prio = dscp >> 3).
+	 */
+	for (int i = 0; i < DSCP_MAP_MAX; i++) {
+		queue = (i >> 3) << RTL93XX_REMAP_DSCP_INTPRI_DSCP_OFFSET(i);
+		sw_w32_mask(RTL93XX_REMAP_DSCP_INTPRI_DSCP_MASK(i),
+			    queue, RTL930X_REMAP_DSCP(i));
+	}
+}
+
+static void rtldsa_930x_qos_prio2queue_matrix(int *min_queues)
+{
+	u32 v = 0;
+
+	for (int i = 0; i < MAX_PRIOS; i++)
+		v |= i << (min_queues[i] * 3);
+
+	sw_w32(v, RTL930X_QM_INTPRI2QID_CTRL);
+}
+
+static void rtldsa_930x_qos_set_scheduling_queue_weights(struct rtl838x_switch_priv *priv)
+{
+	struct dsa_port *dp;
+	u32 addr;
+
+	dsa_switch_for_each_user_port(dp, priv->ds) {
+		for (int q = 0; q < 8; q++) {
+			if (dp->index < 24)
+				addr = RTL930X_SCHED_PORT_Q_CTRL_SET0(dp->index, q);
+			else
+				addr = RTL930X_SCHED_PORT_Q_CTRL_SET1(dp->index, q);
+
+			sw_w32(rtldsa_default_queue_weights[q], addr);
+		}
+	}
+}
+
+static void rtldsa_930x_qos_init(struct rtl838x_switch_priv *priv)
+{
+	struct dsa_port *dp;
+	u32 v;
+
+	/* Assign all the ports to the Group-0 */
+	dsa_switch_for_each_user_port(dp, priv->ds)
+		rtldsa_930x_qos_set_group_selector(dp->index, 0);
+
+	rtldsa_930x_qos_prio2queue_matrix(rtldsa_max_available_queue);
+
+	/* configure priority weights */
+	v = 0;
+	v |= FIELD_PREP(RTL93XX_PRI_SEL_TBL_CTRL_PORT_MASK, 3);
+	v |= FIELD_PREP(RTL93XX_PRI_SEL_TBL_CTRL_DSCP_MASK, 5);
+	v |= FIELD_PREP(RTL93XX_PRI_SEL_TBL_CTRL_ITAG_MASK, 6);
+	v |= FIELD_PREP(RTL93XX_PRI_SEL_TBL_CTRL_OTAG_MASK, 7);
+
+	sw_w32(v, RTL930X_PRI_SEL_TBL_CTRL(0));
+
+	rtldsa_930x_qos_setup_default_dscp2queue_map();
+	rtldsa_930x_qos_set_scheduling_queue_weights(priv);
+}
+
 const struct rtl838x_reg rtl930x_reg = {
 	.mask_port_reg_be = rtl838x_mask_port_reg,
 	.set_port_reg_be = rtl838x_set_port_reg,
@@ -2526,6 +2616,10 @@ const struct rtl838x_reg rtl930x_reg = {
 	.stat_rst = RTL930X_STAT_RST,
 	.stat_port_std_mib = RTL930X_STAT_PORT_MIB_CNTR,
 	.stat_port_prv_mib = RTL930X_STAT_PORT_PRVTE_CNTR,
+	.stat_counters_lock = rtldsa_counters_lock_register,
+	.stat_counters_unlock = rtldsa_counters_unlock_register,
+	.stat_update_counters_atomically = rtldsa_update_counters_atomically,
+	.stat_counter_poll_interval = RTLDSA_COUNTERS_POLL_INTERVAL,
 	.traffic_enable = rtl930x_traffic_enable,
 	.traffic_disable = rtl930x_traffic_disable,
 	.traffic_set = rtl930x_traffic_set,
@@ -2566,6 +2660,7 @@ const struct rtl838x_reg rtl930x_reg = {
 	.vlan_port_keep_tag_set = rtl930x_vlan_port_keep_tag_set,
 	.vlan_port_pvidmode_set = rtl930x_vlan_port_pvidmode_set,
 	.vlan_port_pvid_set = rtl930x_vlan_port_pvid_set,
+	.vlan_port_fast_age = rtldsa_930x_vlan_port_fast_age,
 	.trk_mbr_ctr = rtl930x_trk_mbr_ctr,
 	.rma_bpdu_fld_pmask = RTL930X_RMA_BPDU_FLD_PMSK,
 	.init_eee = rtl930x_init_eee,
@@ -2601,4 +2696,5 @@ const struct rtl838x_reg rtl930x_reg = {
 	.enable_learning = rtldsa_930x_enable_learning,
 	.enable_flood = rtldsa_930x_enable_flood,
 	.set_receive_management_action = rtldsa_930x_set_receive_management_action,
+	.qos_init = rtldsa_930x_qos_init,
 };

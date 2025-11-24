@@ -566,9 +566,9 @@ static void rtl838x_set_static_move_action(int port, bool forward)
 static void rtl838x_stp_get(struct rtl838x_switch_priv *priv, u16 msti, u32 port_state[])
 {
 	u32 cmd = 1 << 15 | /* Execute cmd */
-	          1 << 14 | /* Read */
-	          2 << 12 | /* Table type 0b10 */
-	          (msti & 0xfff);
+		  1 << 14 | /* Read */
+		  2 << 12 | /* Table type 0b10 */
+		  (msti & 0xfff);
 	priv->r->exec_tbl0_cmd(cmd);
 
 	for (int i = 0; i < 2; i++)
@@ -578,9 +578,9 @@ static void rtl838x_stp_get(struct rtl838x_switch_priv *priv, u16 msti, u32 port
 static void rtl838x_stp_set(struct rtl838x_switch_priv *priv, u16 msti, u32 port_state[])
 {
 	u32 cmd = 1 << 15 | /* Execute cmd */
-	          0 << 14 | /* Write */
-	          2 << 12 | /* Table type 0b10 */
-	          (msti & 0xfff);
+		  0 << 14 | /* Write */
+		  2 << 12 | /* Table type 0b10 */
+		  (msti & 0xfff);
 
 	for (int i = 0; i < 2; i++)
 		sw_w32(port_state[i], priv->r->tbl_access_data_0(i));
@@ -1673,6 +1673,10 @@ const struct rtl838x_reg rtl838x_reg = {
 	.stat_port_rst = RTL838X_STAT_PORT_RST,
 	.stat_rst = RTL838X_STAT_RST,
 	.stat_port_std_mib = RTL838X_STAT_PORT_STD_MIB,
+	.stat_counters_lock = rtldsa_counters_lock_register,
+	.stat_counters_unlock = rtldsa_counters_unlock_register,
+	.stat_update_counters_atomically = rtldsa_update_counters_atomically,
+	.stat_counter_poll_interval = RTLDSA_COUNTERS_POLL_INTERVAL,
 	.port_iso_ctrl = rtl838x_port_iso_ctrl,
 	.traffic_enable = rtl838x_traffic_enable,
 	.traffic_disable = rtl838x_traffic_disable,
