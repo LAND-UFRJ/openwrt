@@ -1,0 +1,60 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.1)
++cmake_minimum_required(VERSION 3.5)
+ project(CSIdump)
+
+ set(CMAKE_CXX_STANDARD 17)
+@@ -4,9 +4,6 @@ project(CSIdump)
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED True)
+ 
+-#set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
+-set(CMAKE_CXX_COMPILER /home/daniel/openwrt-sdk_24-10-01/openwrt-sdk-24.10.1-mediatek-filogic_gcc-13.3.0_musl.Linux-x86_64/staging_dir/toolchain-aarch64_cortex-a53_gcc-13.3.0_musl/bin/aarch64-openwrt-linux-g++)
+-
+ set(SOURCES
+   parsers/parser_mt76.cpp
+   wifi_drv_api/mt76_api.cpp
+@@ -14,21 +11,29 @@ set(SOURCES
+   md.cpp
+ )
+ 
+-include_directories(${CMAKE_SOURCE_DIR})
+-
+ add_executable(CSIdump ${SOURCES} main.cpp)
++target_include_directories(CSIdump PRIVATE ${CMAKE_SOURCE_DIR})
+ 
+-set(LIBNL_TINY_PATH /data/mediatek/leaks/meta-gl-motion-detection/recipes-ccsp/hal/files/libnl-tiny_bin/usr/local/lib/)
++find_path(LIBNL_TINY_INCLUDE_DIR
++  NAMES unl.h netlink/attr.h
++  PATH_SUFFIXES libnl-tiny
++)
+ 
+-find_library(LIBNL_TINY nl-tiny PATHS ${LIBNL_TINY_PATH})
++find_library(LIBNL_TINY_LIBRARY
++  NAMES nl-tiny
++)
+ 
+-include_directories(/data/mediatek/leaks/meta-gl-motion-detection/recipes-ccsp/hal/files/libnl-tiny_bin/usr/local/include/libnl-tiny/)
++if(NOT LIBNL_TINY_INCLUDE_DIR)
++  message(FATAL_ERROR "libnl-tiny headers not found (need unl.h and netlink/attr.h)")
++endif()
++
++if(NOT LIBNL_TINY_LIBRARY)
++  message(FATAL_ERROR "libnl-tiny library not found")
++endif()
++
++target_include_directories(CSIdump PRIVATE ${LIBNL_TINY_INCLUDE_DIR})
+ 
+ add_compile_options(-Wall -Wextra)
+-
+-# Static linking configuration
+-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+-set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+ 
+ find_package(Threads REQUIRED)
+-target_link_libraries(CSIdump PRIVATE Threads::Threads ${LIBNL_TINY} -lgcc_eh -lgcc -static-libgcc -static-libstdc++)
++target_link_libraries(CSIdump PRIVATE Threads::Threads ${LIBNL_TINY_LIBRARY})
++
++install(TARGETS CSIdump RUNTIME DESTINATION bin)

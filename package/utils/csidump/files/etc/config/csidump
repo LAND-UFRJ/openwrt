@@ -1,0 +1,11 @@
+config csidump 'phy0'
+    option enabled '1'
+    option interface 'phy0-ap0'
+    option interval '1'
+    option port '59876'
+
+config csidump 'phy1'
+    option enabled '1'
+    option interface 'phy1-ap0'
+    option interval '1'
+    option port '59877'
