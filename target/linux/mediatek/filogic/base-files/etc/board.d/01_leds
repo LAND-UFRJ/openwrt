@@ -36,6 +36,7 @@ cudy,re3000-v1)
 	ucidef_set_led_netdev "lan" "lan" "green:lan" "eth0" "link tx rx"
 	;;
 cudy,wr3000-v1)
+	ucidef_set_led_netdev "lan" "lan" "blue:lan" "br-lan" "link"
 	ucidef_set_led_netdev "wan" "wan" "blue:wan" "wan"
 	;;
 glinet,gl-x3000|\
