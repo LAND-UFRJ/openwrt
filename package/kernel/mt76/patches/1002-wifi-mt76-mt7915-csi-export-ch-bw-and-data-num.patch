@@ -1,0 +1,19 @@
+diff --git a/mt7915/vendor.c b/mt7915/vendor.c
+index 98fd9c2..ae051b3 100644
+--- a/mt7915/vendor.c
++++ b/mt7915/vendor.c
+@@ -384,7 +384,14 @@ mt7915_vendor_csi_ctrl_dump(struct wiphy *wiphy, struct wireless_dev *wdev,
+ 		if (nla_put_u8(skb, MTK_VENDOR_ATTR_CSI_DATA_VER, 1) ||
+ 		    nla_put_u8(skb, MTK_VENDOR_ATTR_CSI_DATA_RSSI, csi->rssi) ||
+ 		    nla_put_u8(skb, MTK_VENDOR_ATTR_CSI_DATA_SNR, csi->snr) ||
++		    /*
++		     * Keep BW attr backward-compatible with existing userspace
++		     * expectations (data_bw), and export real channel bandwidth
++		     * and effective tone count in RSVD1/RSVD2.
++		     */
+ 		    nla_put_u8(skb, MTK_VENDOR_ATTR_CSI_DATA_BW, csi->data_bw) ||
++		    nla_put_u8(skb, MTK_VENDOR_ATTR_CSI_DATA_RSVD1, csi->ch_bw) ||
++		    nla_put_u16(skb, MTK_VENDOR_ATTR_CSI_DATA_RSVD2, csi->data_num) ||
+ 		    nla_put_u8(skb, MTK_VENDOR_ATTR_CSI_DATA_CH_IDX, csi->pri_ch_idx) ||
+ 		    nla_put_u8(skb, MTK_VENDOR_ATTR_CSI_DATA_MODE, csi->rx_mode))
+ 			goto out;
